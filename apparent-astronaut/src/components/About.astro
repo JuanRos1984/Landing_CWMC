@@ -1,0 +1,40 @@
+---
+import type { About } from "../types/pages";
+
+interface Props {
+  data: About;
+  imageUrl?: string;  
+}
+
+const { data, imageUrl } = Astro.props;
+const defaultImage = "/images/about/virtual-meeting.jpg";
+---
+
+<section id="about" class="py-16 sm:py-20 lg:py-24 bg-white">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-8 sm:mb-10 text-center">
+        {data.title}
+      </h2>
+      
+      <div class="grid md:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <!-- Texto -->
+        <div class="prose prose-base sm:prose-lg max-w-none text-gray-600 order-2 md:order-1">
+          {data.content.split('\n').map((paragraph) => (
+            <p class="mb-3 sm:mb-4 last:mb-0">{paragraph}</p>
+          ))}
+        </div>
+        
+        <!-- Imagen -->
+        <div class="order-1 md:order-2 mb-6 md:mb-0">
+          <img 
+            src={imageUrl || defaultImage}
+            alt={data.title}
+            class="w-full h-auto rounded-xl shadow-lg object-cover"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,41 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Hero from "../../components/Hero.astro";
+import About from "../../components/About.astro";
+import Services from "../../components/Services.astro";
+import CTA from "../../components/CTA.astro";
+import ContactForm from "../../components/ContactForm.astro";
+import { getPage } from "../../lib/api";
+import type { Locale } from "../../types/pages";
+
+
+export async function getStaticPaths() {
+  return [
+    { params: { locale: "en" } },
+    { params: { locale: "es" } },
+    { params: { locale: "fr" } },
+  ];
+}
+
+const { locale } = Astro.params;
+const validLocales: Locale[] = ["en", "es", "fr"];
+const safeLocale: Locale = validLocales.includes(locale as Locale) ? (locale as Locale) : "en";
+
+const page = await getPage("home", safeLocale);
+---
+
+<BaseLayout title={page.hero.companyName}>
+  <ContactForm slot="contact-form" email={page.cta.email} />
+  
+  <Hero
+    companyName={page.hero.companyName}
+    title={page.hero.headline}
+    description={page.hero.description}
+    buttonText={page.hero.buttonText}
+    buttonUrl={page.hero.buttonUrl}
+  />
+  
+  <About data={page.about} />
+  <Services data={page.services} />
+  <CTA data={page.cta} />
+</BaseLayout>

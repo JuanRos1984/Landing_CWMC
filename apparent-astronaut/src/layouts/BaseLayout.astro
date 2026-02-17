@@ -1,0 +1,32 @@
+---
+import "../styles/global.css";
+import LanguageSelector from "../components/LanguageSelector.astro";
+
+
+const { title = "Landing" } = Astro.props;
+const { pathname } = Astro.url;
+const currentLocale = pathname.split('/')[1] || 'en';
+---
+
+<!DOCTYPE html>
+<html lang={currentLocale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    
+    <!-- Alpine.js CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  </head>
+  <body class="bg-gray-50 text-gray-800 antialiased" x-data="{ showContactForm: false }">
+    
+    <LanguageSelector currentLocale={currentLocale} />
+    
+    
+    <slot name="contact-form" />
+    
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

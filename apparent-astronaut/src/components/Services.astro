@@ -1,0 +1,61 @@
+---
+import type { Services } from "../types/pages";
+
+interface Props {
+  data: Services;
+  serviceIcons?: Record<string, string>; 
+}
+
+const { data, serviceIcons = {} } = Astro.props;
+---
+
+<section id="services" class="py-16 sm:py-20 lg:py-24 bg-gray-50">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16 lg:mb-20">
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4">
+        {data.title}
+      </h2>
+      
+      {data.description && (
+        <p class="text-base sm:text-lg lg:text-xl text-gray-600">
+          {data.description}
+        </p>
+      )}
+    </div>
+
+    <div class="space-y-12 sm:space-y-16 lg:space-y-20">
+      {data.categories.map((category) => (
+        <div key={category.id} class="bg-white rounded-xl shadow-sm p-6 sm:p-8 lg:p-10">
+          <h3 class="text-xl sm:text-2xl lg:text-3xl font-semibold text-blue-600 mb-4 sm:mb-6 pb-2 border-b">
+            {category.categoryName}
+          </h3>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+            {category.services.map((service) => (
+              <div key={service.id} class="p-4 sm:p-5 lg:p-6 border rounded-lg hover:shadow-md transition">
+                {/* Imagen del servicio (si existe) */}
+                {serviceIcons[service.name] && (
+                  <div class="mb-3 sm:mb-4">
+                    <img 
+                      src={serviceIcons[service.name]} 
+                      alt=""
+                      class="w-12 h-12 object-contain"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+                
+                <h4 class="font-semibold text-gray-900 mb-2 text-base sm:text-lg">
+                  {service.name}
+                </h4>
+                <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
+                  {service.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
