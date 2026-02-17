@@ -1,5 +1,5 @@
 // src/pages/api/contact.ts
-export const prerender = false; 
+
 import type { APIRoute } from 'astro';
 import { sendContactEmail } from '../../lib/email';
 
