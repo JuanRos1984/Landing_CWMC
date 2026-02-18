@@ -16,5 +16,8 @@
     "astro-swiper": "^2.1.0",
     "resend": "^6.9.2",
     "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3"
   }
 }
