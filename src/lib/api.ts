@@ -1,7 +1,7 @@
 // src/lib/api.ts
 import type { PageName, Locale, HomePage, ServiceCategory, ServiceItem } from "../types/pages";
 
-const API_URL = 'http://localhost:1337/api';
+const API_URL = import.meta.env.PUBLIC_STRAPI_URL || 'http://localhost:1337/api';
 
 interface StrapiResponse<T> {
   data: T;
