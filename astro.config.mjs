@@ -21,11 +21,7 @@ import tailwindcss from '@tailwindcss/vite';
 import node from '@astrojs/node';
 
 export default defineConfig({
-  output: 'static',
-  server: {
-    host: '0.0.0.0',
-    port: process.env.PORT ? parseInt(process.env.PORT) : 10000
-  },
+  output: 'server',
   vite: {
     plugins: [tailwindcss()]
   },
