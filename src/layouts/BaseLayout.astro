@@ -18,7 +18,14 @@ const currentLocale = pathname.split('/')[1] || 'en';
     <!-- Alpine.js CDN -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   </head>
-  <body class="bg-gray-50 text-gray-800 antialiased" x-data="{ showContactForm: false }">
+  
+  <!-- Color del logo -->
+  <!-- <body style="background-color: #0f1f41;" class="text-gray-100 antialiased" x-data="{ showContactForm: false }"></body> -->
+  
+  <!-- Color recomendado -->
+  <body class="bg-gradient-to-b from-blue-200 to-white" x-data="{ showContactForm: false }">
+
+    <!--0f1f41 el azul del fondo--> 
     
     <LanguageSelector currentLocale={currentLocale} />
     
