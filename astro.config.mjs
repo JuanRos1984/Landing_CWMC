@@ -1,31 +1,12 @@
-//----------CONFIGURACION LOCAL
-// import { defineConfig } from 'astro/config';
-// import tailwindcss from '@tailwindcss/vite';
-// import node from '@astrojs/node';
-
-// // https://astro.build/config
-// export default defineConfig({
-//   output: 'static', 
-//   vite: {
-//     plugins: [tailwindcss()]
-//   },
-//   adapter: node({
-//     mode: 'standalone'
-//   })
-// });
-
-
-//----------CONFIGURACION PARA PRODUCCION
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
-import node from '@astrojs/node';
+import vercel from '@astrojs/vercel';
 
+// https://astro.build/config
 export default defineConfig({
   output: 'server',
+  adapter: vercel(),
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
   },
-  adapter: node({
-    mode: 'standalone'
-  })
 });
