@@ -8,24 +8,20 @@ import ContactForm from "../../components/ContactForm.astro";
 import { getPage } from "../../lib/api";
 import type { Locale } from "../../types/pages";
 
+const validLocales: Locale[] = ["en", "es", "fr"];
+const { locale } = Astro.params;
 
-export async function getStaticPaths() {
-  return [
-    { params: { locale: "en" } },
-    { params: { locale: "es" } },
-    { params: { locale: "fr" } },
-  ];
+// Cualquier idioma fuera de la lista es una URL inexistente, no una copia
+// del sitio en ingles: se responde 404 para no generar contenido duplicado.
+if (!validLocales.includes(locale as Locale)) {
+  return new Response(null, { status: 404, statusText: "Not found" });
 }
 
-const { locale } = Astro.params;
-const validLocales: Locale[] = ["en", "es", "fr"];
-const safeLocale: Locale = validLocales.includes(locale as Locale) ? (locale as Locale) : "en";
-
-const page = await getPage("home", safeLocale);
+const page = await getPage("home", locale as Locale);
 ---
 
 <BaseLayout title={page.hero.companyName}>
-  <ContactForm slot="contact-form" email={page.cta.email} />
+  <ContactForm slot="contact-form" />
   
   <Hero
     companyName={page.hero.companyName}

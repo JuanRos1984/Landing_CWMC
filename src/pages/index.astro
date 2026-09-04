@@ -13,7 +13,7 @@ const page = await getPage("home", DEFAULT_LOCALE);
 
 <BaseLayout title={page.hero.companyName}>
   
-  <ContactForm email={page.cta.email} /> 
+  <ContactForm slot="contact-form" />
   
   <Hero
     companyName={page.hero.companyName}

@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: connectingwordsmc-landing
+    runtime: node
+    plan: starter
+    region: oregon
+    branch: main
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 22.20.0
+      - key: HOST
+        value: 0.0.0.0
+      # El resto se define en el panel de Render, no aqui:
+      #   STRAPI_URL
+      #   RESEND_API_KEY
+      #   FROM_EMAIL
+      #   CONTACT_TO_EMAIL
