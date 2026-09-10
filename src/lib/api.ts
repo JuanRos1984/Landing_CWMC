@@ -1,4 +1,11 @@
 // src/lib/api.ts
+//
+// Esta capa solo corre al compilar. El sitio es estatico, asi que Strapi se
+// consulta una vez por idioma durante la construccion y nunca cuando alguien
+// visita la pagina. Si Strapi no responde, la compilacion falla a proposito:
+// mas vale que no salga una version nueva a que salga una vacia. La version
+// anterior del sitio sigue publicada mientras tanto.
+
 import type { PageName, Locale, HomePage, ServiceCategory, ServiceItem } from "../types/pages";
 
 const STRAPI_URL =
@@ -8,20 +15,8 @@ const STRAPI_URL =
 
 const API_URL = `${STRAPI_URL.replace(/\/$/, "")}/api`;
 
-/** Cuanto tarda una peticion a Strapi antes de darla por perdida. */
-const REQUEST_TIMEOUT_MS = Number(import.meta.env.STRAPI_TIMEOUT_MS ?? 8000);
-
-/** Cuanto tiempo se sirve una respuesta cacheada sin volver a preguntar. */
-const CACHE_TTL_MS = Number(import.meta.env.STRAPI_CACHE_TTL_MS ?? 60_000);
-
-/**
- * Cache en memoria por locale. Cumple dos funciones:
- *  1. Evita golpear Strapi en cada visita.
- *  2. Guarda la ultima version buena, para seguir sirviendo la pagina si
- *     Strapi esta reiniciando, dormido o caido.
- */
-type CacheEntry = { page: HomePage; fetchedAt: number };
-const cache = new Map<string, CacheEntry>();
+/** Cuanto esperamos a Strapi. Generoso: si esta dormido, tarda en despertar. */
+const REQUEST_TIMEOUT_MS = Number(import.meta.env.STRAPI_TIMEOUT_MS ?? 90_000);
 
 interface StrapiResponse<T> {
   data: T;
@@ -132,59 +127,43 @@ function mapHomePage(data: StrapiHomeData): HomePage {
   };
 }
 
-async function fetchHome(locale: Locale): Promise<HomePage> {
+export async function getPage(page: PageName, locale: Locale): Promise<HomePage> {
+  if (page !== "home") throw new Error("Pagina no soportada");
+
   const url = `${API_URL}/home?locale=${encodeURIComponent(
     locale
   )}&populate[service_categories][populate][services]=*`;
 
-  const res = await fetch(url, {
-    headers: { Accept: "application/json" },
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-  });
+  let res: Response;
+
+  try {
+    res = await fetch(url, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+  } catch (error) {
+    throw new Error(
+      `No se pudo contactar con Strapi en ${API_URL} para el locale ${locale}. ` +
+        `Revisa que STRAPI_URL apunte al sitio correcto y que el servicio este despierto. ` +
+        `Detalle: ${error instanceof Error ? error.message : error}`
+    );
+  }
 
   if (!res.ok) {
     throw new Error(
-      `Strapi respondio ${res.status} ${res.statusText} en ${API_URL}/home (locale ${locale})`
+      `Strapi respondio ${res.status} ${res.statusText} en ${API_URL}/home (locale ${locale}). ` +
+        `Un 403 aqui suele significar que al rol publico le falta el permiso de lectura sobre Home.`
     );
   }
 
   const json = (await res.json()) as StrapiResponse<StrapiHomeData>;
 
   if (!json?.data) {
-    throw new Error(`Home sin datos en Strapi para el locale ${locale}`);
+    throw new Error(
+      `Strapi no devolvio contenido para el locale ${locale}. ` +
+        `Comprueba que la entrada Home este publicada en ese idioma.`
+    );
   }
 
   return mapHomePage(json.data);
-}
-
-export async function getPage(page: PageName, locale: Locale): Promise<HomePage> {
-  if (page !== "home") throw new Error("Pagina no soportada");
-
-  const cached = cache.get(locale);
-
-  if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
-    return cached.page;
-  }
-
-  try {
-    const fresh = await fetchHome(locale);
-    cache.set(locale, { page: fresh, fetchedAt: Date.now() });
-    return fresh;
-  } catch (error) {
-    // Strapi fallo. Si tenemos una version anterior la servimos igual:
-    // una pagina con contenido de hace un rato es mejor que un error 500.
-    if (cached) {
-      console.error(
-        `[strapi] fallo la recarga del locale ${locale}, se sirve la copia en cache:`,
-        error instanceof Error ? error.message : error
-      );
-      return cached.page;
-    }
-
-    console.error(
-      `[strapi] sin datos ni cache para el locale ${locale}:`,
-      error instanceof Error ? error.message : error
-    );
-    throw error;
-  }
 }

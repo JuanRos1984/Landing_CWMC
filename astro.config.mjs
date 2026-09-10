@@ -1,14 +1,13 @@
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
-import node from '@astrojs/node';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://connectingwordsmc.com',
-  output: 'server',
-  // Render ejecuta el servidor de Node directamente: modo standalone.
-  // El servidor lee HOST y PORT del entorno, que es lo que Render inyecta.
-  adapter: node({ mode: 'standalone' }),
+  // Sitio estatico: las paginas se generan al compilar, leyendo el contenido
+  // de Strapi una sola vez. Render las sirve desde su red de distribucion,
+  // sin servidor propio y sin arranque en frio.
+  output: 'static',
   vite: {
     plugins: [tailwindcss()],
   },

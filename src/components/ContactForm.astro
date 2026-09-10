@@ -1,7 +1,21 @@
 ---
 // src/components/ContactForm.astro
-// El destinatario del correo vive en el servidor (CONTACT_TO_EMAIL).
-// Este componente nunca lo conoce ni lo envia.
+//
+// El sitio es estatico, asi que el formulario no puede enviarse a si mismo:
+// necesita un servidor encendido al otro lado. Ese servidor es Strapi, que ya
+// esta siempre activo para el gestor de contenido, y expone /api/contact.
+//
+// El destinatario del correo vive en la configuracion de Strapi
+// (CONTACT_TO_EMAIL). Este componente nunca lo conoce ni lo envia.
+
+const strapiUrl =
+  import.meta.env.PUBLIC_STRAPI_URL ??
+  import.meta.env.STRAPI_URL ??
+  "http://localhost:1337";
+
+const contactEndpoint =
+  import.meta.env.PUBLIC_CONTACT_ENDPOINT ??
+  `${strapiUrl.replace(/\/$/, "")}/api/contact`;
 ---
 
 <!-- Modal overlay -->
@@ -33,7 +47,8 @@
 
     <!-- Form -->
     <div class="p-6">
-      <form 
+      <form
+        data-endpoint={contactEndpoint}
         x-data="{
           formName: '',
           formEmail: '',
@@ -56,7 +71,7 @@
                 website: this.formWebsite
               };
 
-              const response = await fetch('/api/contact', {
+              const response = await fetch(this.$el.dataset.endpoint, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',

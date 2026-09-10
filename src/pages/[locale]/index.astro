@@ -8,15 +8,14 @@ import ContactForm from "../../components/ContactForm.astro";
 import { getPage } from "../../lib/api";
 import type { Locale } from "../../types/pages";
 
-const validLocales: Locale[] = ["en", "es", "fr"];
-const { locale } = Astro.params;
-
-// Cualquier idioma fuera de la lista es una URL inexistente, no una copia
-// del sitio en ingles: se responde 404 para no generar contenido duplicado.
-if (!validLocales.includes(locale as Locale)) {
-  return new Response(null, { status: 404, statusText: "Not found" });
+// Se genera una pagina por idioma al compilar. Cualquier otro idioma no
+// existe como archivo, asi que Render devuelve 404 por si solo.
+export function getStaticPaths() {
+  const locales: Locale[] = ["en", "es", "fr"];
+  return locales.map((locale) => ({ params: { locale } }));
 }
 
+const { locale } = Astro.params;
 const page = await getPage("home", locale as Locale);
 ---
 
