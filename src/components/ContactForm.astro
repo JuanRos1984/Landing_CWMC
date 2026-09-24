@@ -76,7 +76,8 @@ const contactEndpoint =
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(datos)
+                body: JSON.stringify(datos),
+                signal: AbortSignal.timeout(45000)
               });
 
               const responseText = await response.text();
@@ -103,7 +104,15 @@ const contactEndpoint =
               }, 2000);
 
             } catch (error) {
-              this.errorMessage = error.message || 'Could not send your message. Please try again.';
+              // Sin esto, un servidor lento o caido deja el boton en
+              // 'Sending...' para siempre y la persona no sabe que hacer.
+              if (error.name === 'TimeoutError' || error.name === 'AbortError') {
+                this.errorMessage = 'The server is taking too long to respond. Please try again, or write to us directly.';
+              } else if (error instanceof TypeError) {
+                this.errorMessage = 'Could not reach the server. Check your connection and try again.';
+              } else {
+                this.errorMessage = error.message || 'Could not send your message. Please try again.';
+              }
             } finally {
               this.isSending = false;
             }
