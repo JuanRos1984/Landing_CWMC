@@ -1,0 +1,32 @@
+# La landing es un sitio estatico: Render la sirve desde su red de
+# distribucion, gratis y sin arranque en frio. El contenido se lee de Strapi
+# una sola vez, al compilar.
+#
+# Para que un cambio de texto en el gestor se publique solo, hay que crear un
+# Deploy Hook en este servicio y pegar su URL en Strapi:
+#   Settings > Webhooks > nuevo webhook con los eventos de publicar y
+#   despublicar entradas.
+services:
+  - type: web
+    runtime: static
+    name: connectingwordsmc-landing
+    branch: main
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: NODE_VERSION
+        value: 22.20.0
+      # Direccion del gestor de contenido. Se lee al compilar para traer los
+      # textos, y se hornea en el HTML como destino del formulario.
+      - key: PUBLIC_STRAPI_URL
+        value: https://strapi-cwmc.onrender.com
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /*
+        name: X-Frame-Options
+        value: DENY

@@ -8,24 +8,19 @@ import ContactForm from "../../components/ContactForm.astro";
 import { getPage } from "../../lib/api";
 import type { Locale } from "../../types/pages";
 
-
-export async function getStaticPaths() {
-  return [
-    { params: { locale: "en" } },
-    { params: { locale: "es" } },
-    { params: { locale: "fr" } },
-  ];
+// Se genera una pagina por idioma al compilar. Cualquier otro idioma no
+// existe como archivo, asi que Render devuelve 404 por si solo.
+export function getStaticPaths() {
+  const locales: Locale[] = ["en", "es", "fr"];
+  return locales.map((locale) => ({ params: { locale } }));
 }
 
 const { locale } = Astro.params;
-const validLocales: Locale[] = ["en", "es", "fr"];
-const safeLocale: Locale = validLocales.includes(locale as Locale) ? (locale as Locale) : "en";
-
-const page = await getPage("home", safeLocale);
+const page = await getPage("home", locale as Locale);
 ---
 
 <BaseLayout title={page.hero.companyName}>
-  <ContactForm slot="contact-form" email={page.cta.email} />
+  <ContactForm slot="contact-form" />
   
   <Hero
     companyName={page.hero.companyName}

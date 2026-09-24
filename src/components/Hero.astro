@@ -16,11 +16,18 @@ const bgImage = backgroundImage || "/images/hero/meeting.jpg";
 <section class="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden">
   <!-- Video de fondo con overlay más suave -->
   <div class="absolute inset-0 z-0">
-    <video 
-      autoplay 
-      muted 
-      loop 
+    <!--
+      El poster se pinta al instante mientras el video se descarga, asi que la
+      portada nunca aparece en negro. Tambien es lo que ven los navegadores que
+      respetan "reducir movimiento" y no reproducen nada.
+    -->
+    <video
+      autoplay
+      muted
+      loop
       playsinline
+      poster="/images/hero/hero-poster.jpg"
+      aria-hidden="true"
       class="w-full h-full object-cover"
     >
       <source src="/images/hero/hero-video-5.mp4" type="video/mp4" />
