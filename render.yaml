@@ -6,6 +6,12 @@
 # Deploy Hook en este servicio y pegar su URL en Strapi:
 #   Settings > Webhooks > nuevo webhook con los eventos de publicar y
 #   despublicar entradas.
+#
+# OJO: el despliegue automatico solo funciona si el repositorio esta
+# conectado desde el panel de Render con una credencial de GitHub. Si el
+# servicio se creo apuntando a la URL publica del repositorio, GitHub no
+# tiene a quien avisar y los push no disparan nada: hay que lanzarlos a
+# mano desde el panel o por la API.
 services:
   - type: web
     runtime: static
